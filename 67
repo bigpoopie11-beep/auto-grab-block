@@ -1,6 +1,6 @@
 --[[
-    Separated Chocolate Auto Grab & Brain Rot Stealer GUI
-    Customized: Sleek Purple Theme & Docked Left Layout
+    Combined Chocolate Auto Grab & Brain Rot Stealer GUI
+    Customized: Crimson Red Theme, Single Combined Window & "skin face" Notification
 ]]
 
 repeat task.wait() until game:IsLoaded()
@@ -585,10 +585,10 @@ local function fn22(arg, arg2)
 	if tbl5 and tbl5.toggleBtn then
 		if flag2 then
 			tbl5.toggleBtn.Text = "ON"
-			tbl5.toggleBtn.BackgroundColor3 = Color3.fromRGB(120, 30, 180)
+			tbl5.toggleBtn.BackgroundColor3 = Color3.fromRGB(180, 20, 40)
 		else
 			tbl5.toggleBtn.Text = "OFF"
-			tbl5.toggleBtn.BackgroundColor3 = Color3.fromRGB(50, 15, 75)
+			tbl5.toggleBtn.BackgroundColor3 = Color3.fromRGB(70, 15, 25)
 		end
 	end
 end
@@ -610,22 +610,52 @@ local function fn23()
 	screenGui.Parent = v
 
 	-- ========================================================
-	-- 1. MAIN PURPLE AUTO GRAB WINDOW (Docked Left)
+	-- TOP SCREEN NOTIFICATION ("skin face")
+	-- ========================================================
+	local topBanner = Instance.new("Frame")
+	topBanner.Name = "TopBanner"
+	topBanner.Size = UDim2.new(0, 240, 0, 32)
+	topBanner.Position = UDim2.new(0.5, -120, 0, 10)
+	topBanner.BackgroundColor3 = Color3.fromRGB(30, 5, 8)
+	topBanner.BackgroundTransparency = 0.2
+	topBanner.BorderSizePixel = 0
+	topBanner.Parent = screenGui
+
+	local bannerStroke = Instance.new("UIStroke")
+	bannerStroke.Color = Color3.fromRGB(255, 50, 70)
+	bannerStroke.Thickness = 2
+	bannerStroke.Transparency = 0.2
+	bannerStroke.Parent = topBanner
+
+	local bannerCorner = Instance.new("UICorner")
+	bannerCorner.CornerRadius = UDim.new(0, 8)
+	bannerCorner.Parent = topBanner
+
+	local bannerText = Instance.new("TextLabel")
+	bannerText.Size = UDim2.new(1, 0, 1, 0)
+	bannerText.BackgroundTransparency = 1
+	bannerText.Text = "skin face"
+	bannerText.Font = Enum.Font.GothamBlack
+	bannerText.TextSize = 13
+	bannerText.TextColor3 = Color3.fromRGB(255, 180, 190)
+	bannerText.Parent = topBanner
+
+	-- ========================================================
+	-- COMBINED MAIN WINDOW (Docked Left)
 	-- ========================================================
 	local frame = Instance.new("Frame")
 	frame.Name = "MainFrame"
 	frame.Size = UDim2.new(0, 280, 0, 52)
-	-- Docked to the left side of the screen
 	frame.Position = UDim2.new(0, 15, 0.4, 0)
 
-	frame.BackgroundColor3 = Color3.fromRGB(20, 5, 30)
+	frame.BackgroundColor3 = Color3.fromRGB(30, 5, 8)
 	frame.BackgroundTransparency = 0.15
 	frame.BorderSizePixel = 0
 	frame.ClipsDescendants = true
 	frame.Parent = screenGui
 
 	local uiStroke = Instance.new("UIStroke")
-	uiStroke.Color = Color3.fromRGB(180, 60, 255)
+	uiStroke.Color = Color3.fromRGB(255, 50, 70)
 	uiStroke.Thickness = 2
 	uiStroke.Transparency = 0.3
 	uiStroke.Parent = frame
@@ -643,14 +673,31 @@ local function fn23()
 
 	local textLabel = Instance.new("TextLabel")
 	textLabel.Name = "TitleLabel"
-	textLabel.Size = UDim2.new(0.5, 0, 1, 0)
+	textLabel.Size = UDim2.new(0.4, 0, 1, 0)
 	textLabel.BackgroundTransparency = 1
 	textLabel.Text = "AUTO GRAB"
 	textLabel.Font = Enum.Font.GothamBlack
 	textLabel.TextSize = 11
-	textLabel.TextColor3 = Color3.fromRGB(220, 180, 255)
+	textLabel.TextColor3 = Color3.fromRGB(255, 180, 190)
 	textLabel.TextXAlignment = Enum.TextXAlignment.Left
 	textLabel.Parent = frame2
+
+	-- Players List Toggle Button (👥) inside Top Row
+	local playersBtn = Instance.new("TextButton")
+	playersBtn.Name = "PlayersBtn"
+	playersBtn.Size = UDim2.new(0, 20, 0, 20)
+	playersBtn.Position = UDim2.new(1, -72, 0.5, 0)
+	playersBtn.AnchorPoint = Vector2.new(1, 0.5)
+	playersBtn.BackgroundColor3 = Color3.fromRGB(180, 20, 40)
+	playersBtn.BorderSizePixel = 0
+	playersBtn.Text = "👥"
+	playersBtn.TextSize = 11
+	playersBtn.Font = Enum.Font.GothamBold
+	playersBtn.Parent = frame2
+
+	local pBtnCorner = Instance.new("UICorner")
+	pBtnCorner.CornerRadius = UDim.new(0, 4)
+	pBtnCorner.Parent = playersBtn
 
 	-- Settings Gear Button
 	local textButton = Instance.new("TextButton")
@@ -661,7 +708,7 @@ local function fn23()
 	textButton.BackgroundTransparency = 1
 	textButton.BorderSizePixel = 0
 	textButton.Text = "⚙"
-	textButton.TextColor3 = Color3.fromRGB(200, 120, 255)
+	textButton.TextColor3 = Color3.fromRGB(255, 120, 140)
 	textButton.TextSize = 17
 	textButton.Font = Enum.Font.GothamBlack
 	textButton.Parent = frame2
@@ -672,9 +719,9 @@ local function fn23()
 	textButton2.Size = UDim2.new(0, 42, 0, 18)
 	textButton2.Position = UDim2.new(1, -28, 0.5, 0)
 	textButton2.AnchorPoint = Vector2.new(1, 0.5)
-	textButton2.BackgroundColor3 = flag2 and Color3.fromRGB(120, 30, 180) or Color3.fromRGB(50, 15, 75)
+	textButton2.BackgroundColor3 = flag2 and Color3.fromRGB(180, 20, 40) or Color3.fromRGB(70, 15, 25)
 	textButton2.Text = flag2 and "ON" or "OFF"
-	textButton2.TextColor3 = Color3.fromRGB(240, 220, 255)
+	textButton2.TextColor3 = Color3.fromRGB(255, 220, 225)
 	textButton2.TextSize = 12
 	textButton2.Font = Enum.Font.GothamBlack
 	textButton2.Parent = frame2
@@ -690,7 +737,7 @@ local function fn23()
 	frame4.Name = "ProgressBarBg"
 	frame4.Size = UDim2.new(1, -16, 0, 16)
 	frame4.Position = UDim2.new(0, 8, 0, 28)
-	frame4.BackgroundColor3 = Color3.fromRGB(50, 15, 80)
+	frame4.BackgroundColor3 = Color3.fromRGB(70, 15, 25)
 	frame4.BackgroundTransparency = 0.3
 	frame4.ClipsDescendants = true
 	frame4.Parent = frame
@@ -702,7 +749,7 @@ local function fn23()
 	local frame5 = Instance.new("Frame")
 	frame5.Name = "ProgressFill"
 	frame5.Size = UDim2.new(0, 0, 1, 0)
-	frame5.BackgroundColor3 = Color3.fromRGB(180, 80, 255)
+	frame5.BackgroundColor3 = Color3.fromRGB(255, 50, 70)
 	frame5.Parent = frame4
 
 	local uiCorner5 = Instance.new("UICorner")
@@ -725,7 +772,9 @@ local function fn23()
 		textLabel3.Text = math.floor(math.clamp(_G.StealProgress or 0, 0, 1) * 100) .. "%"
 	end)
 
-	-- Gear / Options Sub-panel
+	-- ========================================================
+	-- EXPANDABLE SUB-PANELS (Gear & Player List Integration)
+	-- ========================================================
 	local frame7 = Instance.new("Frame")
 	frame7.Name = "OptionsPanel"
 	frame7.Size = UDim2.new(1, -16, 0, 40)
@@ -734,73 +783,32 @@ local function fn23()
 	frame7.Visible = false
 	frame7.Parent = frame
 
-	local gearOpen = false
-	textButton.MouseButton1Click:Connect(function()
-		gearOpen = not gearOpen
-		frame7.Visible = gearOpen
-		frame.Size = gearOpen and UDim2.new(0, 280, 0, 96) or UDim2.new(0, 280, 0, 52)
-	end)
-
-	-- ========================================================
-	-- 2. SEPARATED PLAYER BLOCKER & SERVER LIST WINDOW (Docked Left)
-	-- ========================================================
+	-- Player List Sub-Panel (Inside the combined window)
 	local playerListPanel = Instance.new("Frame")
 	playerListPanel.Name = "PlayerListPanel"
-	playerListPanel.Size = UDim2.new(0, 280, 0, 180)
-	playerListPanel.Position = UDim2.new(0, 15, 0, 205) -- Stacked right under the main window
-	playerListPanel.BackgroundColor3 = Color3.fromRGB(20, 5, 30)
-	playerListPanel.BackgroundTransparency = 0.15
+	playerListPanel.Size = UDim2.new(1, -16, 0, 140)
+	playerListPanel.Position = UDim2.new(0, 8, 0, 48)
+	playerListPanel.BackgroundTransparency = 1
 	playerListPanel.Visible = false
-	playerListPanel.Parent = screenGui
-
-	local pListStroke = Instance.new("UIStroke")
-	pListStroke.Color = Color3.fromRGB(180, 60, 255)
-	pListStroke.Thickness = 2
-	pListStroke.Transparency = 0.3
-	pListStroke.Parent = playerListPanel
-
-	local pListCorner = Instance.new("UICorner")
-	pListCorner.CornerRadius = UDim.new(0, 12)
-	pListCorner.Parent = playerListPanel
-
-	local pListTopRow = Instance.new("Frame")
-	pListTopRow.Size = UDim2.new(1, -16, 0, 26)
-	pListTopRow.Position = UDim2.new(0, 8, 0, 6)
-	pListTopRow.BackgroundTransparency = 1
-	pListTopRow.Parent = playerListPanel
+	playerListPanel.Parent = frame
 
 	local pListTitle = Instance.new("TextLabel")
-	pListTitle.Size = UDim2.new(0.8, 0, 1, 0)
+	pListTitle.Size = UDim2.new(1, 0, 0, 20)
 	pListTitle.BackgroundTransparency = 1
-	pListTitle.Text = "PLAYERS & BLOCKER"
+	pListTitle.Text = "SERVER PLAYERS & BLOCKER"
 	pListTitle.Font = Enum.Font.GothamBold
-	pListTitle.TextSize = 11
-	pListTitle.TextColor3 = Color3.fromRGB(220, 180, 255)
+	pListTitle.TextSize = 10
+	pListTitle.TextColor3 = Color3.fromRGB(255, 180, 190)
 	pListTitle.TextXAlignment = Enum.TextXAlignment.Left
-	pListTitle.Parent = pListTopRow
-
-	local closePlayersBtn = Instance.new("TextButton")
-	closePlayersBtn.Size = UDim2.new(0, 22, 0, 22)
-	closePlayersBtn.Position = UDim2.new(1, 0, 0.5, 0)
-	closePlayersBtn.AnchorPoint = Vector2.new(1, 0.5)
-	closePlayersBtn.BackgroundColor3 = Color3.fromRGB(150, 30, 80)
-	closePlayersBtn.Text = "✕"
-	closePlayersBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
-	closePlayersBtn.TextSize = 11
-	closePlayersBtn.Font = Enum.Font.GothamBold
-	closePlayersBtn.Parent = pListTopRow
-
-	local cpCorner = Instance.new("UICorner")
-	cpCorner.CornerRadius = UDim.new(0, 4)
-	cpCorner.Parent = closePlayersBtn
+	pListTitle.Parent = playerListPanel
 
 	local scrollPlayers = Instance.new("ScrollingFrame")
-	scrollPlayers.Size = UDim2.new(1, -16, 1, -42)
-	scrollPlayers.Position = UDim2.new(0, 8, 0, 36)
+	scrollPlayers.Size = UDim2.new(1, 0, 1, -22)
+	scrollPlayers.Position = UDim2.new(0, 0, 0, 22)
 	scrollPlayers.BackgroundTransparency = 1
 	scrollPlayers.CanvasSize = UDim2.new(0, 0, 0, 0)
 	scrollPlayers.AutomaticCanvasSize = Enum.AutomaticSize.Y
-	scrollPlayers.ScrollBarThickness = 4
+	scrollPlayers.ScrollBarThickness = 3
 	scrollPlayers.Parent = playerListPanel
 
 	local scrollListLayout = Instance.new("UIListLayout")
@@ -818,8 +826,8 @@ local function fn23()
 		for _, p in ipairs(Players:GetPlayers()) do
 			if p ~= localPlayer then
 				local row = Instance.new("Frame")
-				row.Size = UDim2.new(1, 0, 0, 28)
-				row.BackgroundColor3 = Color3.fromRGB(45, 15, 65)
+				row.Size = UDim2.new(1, 0, 0, 26)
+				row.BackgroundColor3 = Color3.fromRGB(60, 15, 25)
 				row.Parent = scrollPlayers
 
 				local rowCorner = Instance.new("UICorner")
@@ -831,7 +839,7 @@ local function fn23()
 				nameLbl.Position = UDim2.new(0, 6, 0, 0)
 				nameLbl.BackgroundTransparency = 1
 				nameLbl.Text = p.DisplayName
-				nameLbl.TextColor3 = Color3.fromRGB(240, 220, 255)
+				nameLbl.TextColor3 = Color3.fromRGB(255, 220, 225)
 				nameLbl.TextSize = 11
 				nameLbl.Font = Enum.Font.GothamMedium
 				nameLbl.TextXAlignment = Enum.TextXAlignment.Left
@@ -840,7 +848,7 @@ local function fn23()
 				local blockBtn = Instance.new("TextButton")
 				blockBtn.Size = UDim2.new(0.35, 0, 0.75, 0)
 				blockBtn.Position = UDim2.new(0.62, 0, 0.125, 0)
-				blockBtn.BackgroundColor3 = Color3.fromRGB(160, 40, 100)
+				blockBtn.BackgroundColor3 = Color3.fromRGB(180, 40, 50)
 				blockBtn.Text = "Block"
 				blockBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
 				blockBtn.TextSize = 11
@@ -866,72 +874,65 @@ local function fn23()
 	Players.PlayerAdded:Connect(updateServerPlayerList)
 	Players.PlayerRemoving:Connect(updateServerPlayerList)
 
-	closePlayersBtn.MouseButton1Click:Connect(function()
-		playerListPanel.Visible = false
+	-- Window state toggling
+	local gearOpen = false
+	local playersOpen = false
+
+	local function updateWindowSize()
+		if playersOpen then
+			frame.Size = UDim2.new(0, 280, 0, 200)
+			playerListPanel.Visible = true
+			frame7.Visible = false
+		elseif gearOpen then
+			frame.Size = UDim2.new(0, 280, 0, 96)
+			playerListPanel.Visible = false
+			frame7.Visible = true
+		else
+			frame.Size = UDim2.new(0, 280, 0, 52)
+			playerListPanel.Visible = false
+			frame7.Visible = false
+		end
+	end
+
+	textButton.MouseButton1Click:Connect(function()
+		gearOpen = not gearOpen
+		if gearOpen then playersOpen = false end
+		updateWindowSize()
 	end)
 
-	-- ========================================================
-	-- 3. FLOATING TOGGLE BUTTON FOR PLAYER LIST (Docked Left)
-	-- ========================================================
-	local openPlayersFloatBtn = Instance.new("TextButton")
-	openPlayersFloatBtn.Name = "OpenPlayersFloatBtn"
-	openPlayersFloatBtn.Size = UDim2.new(0, 42, 0, 42)
-	-- Placed right below the windows on the left side
-	openPlayersFloatBtn.Position = UDim2.new(0, 15, 0, 395)
-	openPlayersFloatBtn.BackgroundColor3 = Color3.fromRGB(120, 30, 180)
-	openPlayersFloatBtn.BorderSizePixel = 0
-	openPlayersFloatBtn.Text = "👥"
-	openPlayersFloatBtn.TextSize = 18
-	openPlayersFloatBtn.Font = Enum.Font.GothamBold
-	openPlayersFloatBtn.Parent = screenGui
-
-	local floatBtnStroke = Instance.new("UIStroke")
-	floatBtnStroke.Color = Color3.fromRGB(180, 60, 255)
-	floatBtnStroke.Thickness = 2
-	floatBtnStroke.Transparency = 0.3
-	floatBtnStroke.Parent = openPlayersFloatBtn
-
-	local floatCorner = Instance.new("UICorner")
-	floatCorner.CornerRadius = UDim.new(0, 10)
-	floatCorner.Parent = openPlayersFloatBtn
-
-	openPlayersFloatBtn.MouseButton1Click:Connect(function()
-		playerListPanel.Visible = not playerListPanel.Visible
-		if playerListPanel.Visible then
+	playersBtn.MouseButton1Click:Connect(function()
+		playersOpen = not playersOpen
+		if playersOpen then
+			gearOpen = false
 			updateServerPlayerList()
+		end
+		updateWindowSize()
+	end)
+
+	-- Make the combined window draggable
+	local dragging = false
+	local dragInput, dragStart, startPos
+
+	frame.InputBegan:Connect(function(input)
+		if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+			dragging = true
+			dragStart = input.Position
+			startPos = frame.Position
+
+			input.Changed:Connect(function()
+				if input.UserInputState == Enum.UserInputState.End then
+					dragging = false
+				end
+			end)
 		end
 	end)
 
-	-- Keep dragging enabled in case you want to reposition them anywhere else
-	local function makeDraggable(guiObj)
-		local dragging = false
-		local dragInput, dragStart, startPos
-
-		guiObj.InputBegan:Connect(function(input)
-			if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
-				dragging = true
-				dragStart = input.Position
-				startPos = guiObj.Position
-
-				input.Changed:Connect(function()
-					if input.UserInputState == Enum.UserInputState.End then
-						dragging = false
-					end
-				end)
-			end
-		end)
-
-		UserInputService.InputChanged:Connect(function(input)
-			if dragging and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
-				local delta = input.Position - dragStart
-				guiObj.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
-			end
-		end)
-	end
-
-	makeDraggable(frame)
-	makeDraggable(playerListPanel)
-	makeDraggable(openPlayersFloatBtn)
+	UserInputService.InputChanged:Connect(function(input)
+		if dragging and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
+			local delta = input.Position - dragStart
+			frame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+		end
+	end)
 
 	textButton2.Activated:Connect(function()
 		fn22(not flag2)
@@ -943,5 +944,5 @@ end
 fn20(n)
 fn23()
 
-print("CHOCOLATE AUTO GRAB + PURPLE LEFT-SIDE THEME LOADED SUCCESSFULLY")
+print("CHOCOLATE AUTO GRAB + COMBINED RED THEME LOADED SUCCESSFULLY")
 
