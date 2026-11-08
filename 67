@@ -1,0 +1,947 @@
+--[[
+    Separated Chocolate Auto Grab & Brain Rot Stealer GUI
+    Customized: Sleek Purple Theme & Docked Left Layout
+]]
+
+repeat task.wait() until game:IsLoaded()
+
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local UserInputService = game:GetService("UserInputService")
+local HttpService = game:GetService("HttpService")
+local localPlayer = Players.LocalPlayer
+
+local function fn()
+	local ok, result = pcall(function()
+		if gethui then
+			return gethui()
+		end
+		return nil
+	end)
+
+	if ok and result then
+		return result
+	end
+
+	local ok2, result2 = pcall(function()
+		return game:GetService("CoreGui")
+	end)
+
+	if ok2 and result2 then
+		return result2
+	end
+	return localPlayer:WaitForChild("PlayerGui")
+end
+
+local v = fn()
+
+local autoSteal = {
+	AutoStealEnabled = true,
+	StealRadius = 55,
+	StealDuration = 0.1,
+	Mode = "half",
+	HalfFireRange = 2,
+	HalfHoldMin = 1.3,
+	HalfHoldMax = 5,
+	HalfEntryDelay = 0.3,
+	Data = {},
+}
+
+local tbl = {
+	StealRadius = 80,
+	HalfFireRange = 10,
+	HalfHoldMin = 1.3,
+	HalfHoldMax = 2.6,
+	HalfEntryDelay = 0.3,
+	autoEnabled = true,
+}
+
+local tbl2 = {
+	StealRadius = 55,
+	HalfFireRange = 10,
+	HalfHoldMin = 1.3,
+	HalfHoldMax = 2.6,
+	HalfEntryDelay = 0.3,
+	autoEnabled = true,
+}
+
+local tbl3 = {
+	StealRadius = 55,
+	HalfFireRange = 10,
+	HalfHoldMin = 1.3,
+	HalfHoldMax = 2.6,
+	HalfEntryDelay = 0.3,
+	autoEnabled = true,
+}
+
+local flag = false
+local now = nil
+local connection = nil
+_G.StealProgress = 0
+local v2 = nil
+
+local function fn2(arg)
+	if v2 then
+		v2.Size = UDim2.new(math.clamp(arg, 0, 1), 0, 1, 0)
+	end
+end
+
+local connection2 = nil
+
+local function fn3()
+	if connection2 then
+		return
+	end
+
+	connection2 = RunService.Heartbeat:Connect(function()
+		fn2(_G.StealProgress)
+	end)
+end
+
+local function fn4(arg)
+	local plots = workspace:FindFirstChild("Plots")
+	if not plots then
+		return false
+	end
+	local v3 = plots:FindFirstChild(arg)
+	if not v3 then
+		return false
+	end
+	local plotSign = v3:FindFirstChild("PlotSign")
+
+	if plotSign then
+		local yourBase = plotSign:FindFirstChild("YourBase")
+		if yourBase and yourBase:IsA("BillboardGui") then
+			return yourBase.Enabled == true
+		end
+	end
+
+	return false
+end
+
+local function fn5()
+	local character = localPlayer.Character
+	if not character then
+		return nil
+	end
+	local humanoidRootPart = character:FindFirstChild("HumanoidRootPart") or character:FindFirstChild("UpperTorso") or character:FindFirstChild("Torso")
+	if not humanoidRootPart then
+		return nil
+	end
+	local plots = workspace:FindFirstChild("Plots")
+	if not plots then
+		return nil
+	end
+	local huge = math.huge
+	local v3 = nil
+
+	for _, child in ipairs(plots:GetChildren()) do
+		if child:IsA("Model") and not fn4(child.Name) then
+			local animalPodiums = child:FindFirstChild("AnimalPodiums")
+
+			if animalPodiums then
+				for _, child2 in ipairs(animalPodiums:GetChildren()) do
+					local base = child2:FindFirstChild("Base")
+					base = base and base:FindFirstChild("Spawn")
+
+					if base then
+						local magnitude = (base.Position - humanoidRootPart.Position).Magnitude
+
+						if magnitude <= autoSteal.StealRadius and magnitude < huge then
+							local promptAttachment = base:FindFirstChild("PromptAttachment")
+							local v4 = nil
+
+							if promptAttachment then
+								v4 = nil
+
+								for _, child3 in ipairs(promptAttachment:GetChildren()) do
+									if child3:IsA("ProximityPrompt") and child3.ActionText and child3.ActionText:find("Steal") then
+										v4 = child3
+									end
+								end
+							end
+
+							if not v4 then
+								for _, descendant in ipairs(base:GetDescendants()) do
+									if descendant:IsA("ProximityPrompt") and descendant.ActionText and descendant.ActionText:find("Steal") then
+										v4 = descendant
+									end
+								end
+							end
+
+							if v4 then
+								huge = magnitude
+								v3 = v4
+							end
+						end
+					end
+				end
+			end
+		end
+	end
+
+	return v3
+end
+
+local function fn6(arg)
+	local character = localPlayer.Character
+	if not character then
+		return math.huge
+	end
+	local humanoidRootPart = character:FindFirstChild("HumanoidRootPart") or character:FindFirstChild("UpperTorso") or character:FindFirstChild("Torso")
+	if not humanoidRootPart then
+		return math.huge
+	end
+	local parent = arg.Parent
+
+	if parent and parent:IsA("Attachment") then
+		parent = parent.Parent
+	end
+
+	if parent and parent:IsA("BasePart") then
+		return (parent.Position - humanoidRootPart.Position).Magnitude
+	end
+
+	local ok, result = pcall(function()
+		return arg.Parent and arg.Parent.WorldPosition
+	end)
+
+	if ok and result then
+		return (result - humanoidRootPart.Position).Magnitude
+	end
+	return math.huge
+end
+
+local function fn7(arg)
+	if flag then
+		return
+	end
+
+	if not autoSteal.Data[arg] then
+		autoSteal.Data[arg] = { hold = {}, trigger = {}, ready = true }
+
+		if getconnections then
+			for _, v3 in ipairs(getconnections(arg.PromptButtonHoldBegan)) do
+				if v3.Function then
+					table.insert(autoSteal.Data[arg].hold, v3.Function)
+				end
+			end
+
+			for _, v3 in ipairs(getconnections(arg.Triggered)) do
+				if v3.Function then
+					table.insert(autoSteal.Data[arg].trigger, v3.Function)
+				end
+			end
+		end
+	end
+
+	local v3 = autoSteal.Data[arg]
+	if not v3.ready then
+		return
+	end
+	v3.ready = false
+	flag = true
+	now = tick()
+	_G.StealProgress = 0
+
+	if autoSteal.Mode == "half" then
+		task.spawn(function()
+			for _, v4 in ipairs(v3.hold) do
+				task.spawn(v4)
+			end
+
+			task.wait(autoSteal.HalfHoldMin)
+			local halfFireRange = autoSteal.HalfFireRange
+			local flag2 = fn6(arg) <= halfFireRange
+			local halfHoldMax = autoSteal.HalfHoldMax
+
+			while true do
+				local n = tick() - now
+
+				if n > halfHoldMax or not arg.Parent then
+					_G.StealProgress = 1
+					task.wait(0.1)
+					_G.StealProgress = 0
+					task.wait(0.05)
+					v3.ready = true
+					flag = false
+					_G.StealProgress = 0
+					return
+				end
+
+				_G.StealProgress = math.min(n / halfHoldMax, 1)
+				local halfFireRange2 = autoSteal.HalfFireRange
+				if fn6(arg) <= halfFireRange2 then
+					break
+				end
+				task.wait()
+			end
+
+			if not flag2 then
+				task.wait(autoSteal.HalfEntryDelay)
+			end
+
+			_G.StealProgress = 1
+
+			for _, v4 in ipairs(v3.trigger) do
+				task.spawn(v4)
+			end
+
+			task.wait(0.1)
+			_G.StealProgress = 0
+			task.wait(0.05)
+			v3.ready = true
+			flag = false
+			_G.StealProgress = 0
+		end)
+	else
+		task.spawn(function()
+			for _, v4 in ipairs(v3.hold) do
+				task.spawn(v4)
+			end
+
+			local stealDuration = autoSteal.StealDuration
+			local now2 = tick()
+			local exitTo = nil
+
+			while true do
+				local n = tick() - now2
+
+				if stealDuration <= n then
+					exitTo = 1
+					break
+				else
+					if arg.Parent then
+						_G.StealProgress = math.min(n / stealDuration, 1)
+						task.wait()
+						continue
+					end
+
+					break
+				end
+			end
+
+			if exitTo == 1 then
+				_G.StealProgress = 1
+
+				for _, v4 in ipairs(v3.trigger) do
+					task.spawn(v4)
+				end
+
+				task.wait(0.1)
+				_G.StealProgress = 0
+			else
+				_G.StealProgress = 0
+			end
+
+			task.wait(0.05)
+			v3.ready = true
+			flag = false
+			_G.StealProgress = 0
+		end)
+	end
+end
+
+local function fn8(arg)
+	if flag then
+		return
+	end
+
+	if not autoSteal.Data[arg] then
+		autoSteal.Data[arg] = { hold = {}, trigger = {}, ready = true }
+
+		if getconnections then
+			for _, v3 in ipairs(getconnections(arg.PromptButtonHoldBegan)) do
+				if v3.Function then
+					table.insert(autoSteal.Data[arg].hold, v3.Function)
+				end
+			end
+
+			for _, v3 in ipairs(getconnections(arg.Triggered)) do
+				if v3.Function then
+					table.insert(autoSteal.Data[arg].trigger, v3.Function)
+				end
+			end
+		end
+	end
+
+	local v3 = autoSteal.Data[arg]
+	if not v3.ready then
+		return
+	end
+	v3.ready = false
+	flag = true
+	now = tick()
+
+	if autoSteal.Mode == "half" then
+		task.spawn(function()
+			for _, v4 in ipairs(v3.hold) do
+				task.spawn(v4)
+			end
+
+			task.wait(autoSteal.HalfHoldMin)
+			local halfFireRange = autoSteal.HalfFireRange
+			local flag2 = fn6(arg) <= halfFireRange
+
+			while true do
+				local halfHoldMax = autoSteal.HalfHoldMax
+
+				if not (tick() - now > halfHoldMax or not arg.Parent) then
+					local halfFireRange2 = autoSteal.HalfFireRange
+
+					if fn6(arg) <= halfFireRange2 then
+						if not flag2 then
+							task.wait(autoSteal.HalfEntryDelay)
+						end
+
+						for _, v4 in ipairs(v3.trigger) do
+							task.spawn(v4)
+						end
+
+						task.wait(0.05)
+						v3.ready = true
+						flag = false
+						return
+					else
+						task.wait()
+						continue
+					end
+				end
+
+				break
+			end
+
+			task.wait(0.05)
+			v3.ready = true
+			flag = false
+		end)
+	else
+		task.spawn(function()
+			for _, v4 in ipairs(v3.hold) do
+				task.spawn(v4)
+			end
+
+			local n = 0
+
+			while n < autoSteal.StealDuration do
+				n += task.wait()
+				if arg.Parent then
+					continue
+				end
+				break
+			end
+
+			for _, v4 in ipairs(v3.trigger) do
+				task.spawn(v4)
+			end
+
+			task.wait(0.05)
+			v3.ready = true
+			flag = false
+		end)
+	end
+end
+
+local n = 1
+local tbl4 = { "v1", "v2", "v3" }
+
+local function fn9(arg)
+	if n == 2 then
+		fn8(arg)
+	else
+		fn7(arg)
+	end
+end
+
+local function fn10()
+	if connection then
+		return
+	end
+
+	connection = RunService.Heartbeat:Connect(function()
+		if not autoSteal.AutoStealEnabled or flag then
+			return
+		end
+		local v3 = fn5()
+
+		if v3 then
+			fn9(v3)
+		end
+	end)
+end
+
+local function fn11()
+	if connection then
+		connection:Disconnect()
+		connection = nil
+	end
+
+	flag = false
+	_G.StealProgress = 0
+end
+
+_G.AutoSteal = autoSteal
+
+local function fn15()
+	local num = nil
+
+	pcall(function()
+		num = tonumber(readfile("ChocolateAutoGrabRadius.txt"))
+	end)
+
+	if num and num >= 10 and num <= 150 then
+		return num
+	end
+	return nil
+end
+
+local function fn17()
+	local num
+
+	pcall(function()
+		num = tonumber(readfile("ChocolateAutoGrabScale.txt"))
+	end)
+
+	if num and num >= 0.5 and num <= 1.5 then
+		return num
+	end
+	return nil
+end
+
+local function fn18(arg)
+	pcall(function()
+		writefile("ChocolateAutoGrabToggle.txt", arg and "1" or "0")
+	end)
+end
+
+local function fn19()
+	local txt = nil
+
+	pcall(function()
+		txt = readfile("ChocolateAutoGrabToggle.txt")
+	end)
+
+	if txt == "1" then
+		return true
+	end
+
+	if txt == "0" then
+		return false
+	end
+	return nil
+end
+
+local v3 = fn15()
+
+if v3 then
+	autoSteal.StealRadius = v3
+end
+
+local scale = fn17() or 1
+local v4 = fn19()
+local flag2 = v4 == nil and true or v4
+
+if v4 == nil then
+	pcall(fn18, true)
+end
+
+local tbl5 = {}
+
+local function fn20(arg)
+	local v5
+
+	if arg == 1 then
+		v5 = tbl
+	elseif arg == 2 then
+		v5 = tbl2
+	else
+		v5 = tbl3
+	end
+
+	autoSteal.StealRadius = v5.StealRadius
+	autoSteal.HalfFireRange = v5.HalfFireRange
+	autoSteal.HalfHoldMin = v5.HalfHoldMin
+	autoSteal.HalfHoldMax = v5.HalfHoldMax
+	autoSteal.HalfEntryDelay = v5.HalfEntryDelay
+	autoSteal.AutoStealEnabled = v5.autoEnabled
+	fn11()
+
+	if autoSteal.AutoStealEnabled then
+		fn10()
+	end
+
+	if tbl5.updateUI then
+		tbl5.updateUI()
+	end
+end
+
+local function fn22(arg, arg2)
+	flag2 = arg and true or false
+
+	if not arg2 then
+		fn18(flag2)
+	end
+
+	if tbl5 and tbl5.toggleBtn then
+		if flag2 then
+			tbl5.toggleBtn.Text = "ON"
+			tbl5.toggleBtn.BackgroundColor3 = Color3.fromRGB(120, 30, 180)
+		else
+			tbl5.toggleBtn.Text = "OFF"
+			tbl5.toggleBtn.BackgroundColor3 = Color3.fromRGB(50, 15, 75)
+		end
+	end
+end
+
+local function fn23()
+	pcall(function()
+		local autoStealGui = v:FindFirstChild("AutoStealGui")
+		if autoStealGui then
+			autoStealGui:Destroy()
+		end
+	end)
+
+	local screenGui = Instance.new("ScreenGui")
+	screenGui.Name = "AutoStealGui"
+	screenGui.IgnoreGuiInset = true
+	screenGui.ResetOnSpawn = false
+	screenGui.DisplayOrder = 999
+	screenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+	screenGui.Parent = v
+
+	-- ========================================================
+	-- 1. MAIN PURPLE AUTO GRAB WINDOW (Docked Left)
+	-- ========================================================
+	local frame = Instance.new("Frame")
+	frame.Name = "MainFrame"
+	frame.Size = UDim2.new(0, 280, 0, 52)
+	-- Docked to the left side of the screen
+	frame.Position = UDim2.new(0, 15, 0.4, 0)
+
+	frame.BackgroundColor3 = Color3.fromRGB(20, 5, 30)
+	frame.BackgroundTransparency = 0.15
+	frame.BorderSizePixel = 0
+	frame.ClipsDescendants = true
+	frame.Parent = screenGui
+
+	local uiStroke = Instance.new("UIStroke")
+	uiStroke.Color = Color3.fromRGB(180, 60, 255)
+	uiStroke.Thickness = 2
+	uiStroke.Transparency = 0.3
+	uiStroke.Parent = frame
+
+	local uiCorner = Instance.new("UICorner")
+	uiCorner.CornerRadius = UDim.new(0, 12)
+	uiCorner.Parent = frame
+
+	local frame2 = Instance.new("Frame")
+	frame2.Name = "TopRow"
+	frame2.Size = UDim2.new(1, -16, 0, 22)
+	frame2.Position = UDim2.new(0, 8, 0, 3)
+	frame2.BackgroundTransparency = 1
+	frame2.Parent = frame
+
+	local textLabel = Instance.new("TextLabel")
+	textLabel.Name = "TitleLabel"
+	textLabel.Size = UDim2.new(0.5, 0, 1, 0)
+	textLabel.BackgroundTransparency = 1
+	textLabel.Text = "AUTO GRAB"
+	textLabel.Font = Enum.Font.GothamBlack
+	textLabel.TextSize = 11
+	textLabel.TextColor3 = Color3.fromRGB(220, 180, 255)
+	textLabel.TextXAlignment = Enum.TextXAlignment.Left
+	textLabel.Parent = frame2
+
+	-- Settings Gear Button
+	local textButton = Instance.new("TextButton")
+	textButton.Name = "GearBtn"
+	textButton.Size = UDim2.new(0, 20, 0, 20)
+	textButton.Position = UDim2.new(1, 0, 0.5, 0)
+	textButton.AnchorPoint = Vector2.new(1, 0.5)
+	textButton.BackgroundTransparency = 1
+	textButton.BorderSizePixel = 0
+	textButton.Text = "⚙"
+	textButton.TextColor3 = Color3.fromRGB(200, 120, 255)
+	textButton.TextSize = 17
+	textButton.Font = Enum.Font.GothamBlack
+	textButton.Parent = frame2
+
+	-- Toggle Button (ON/OFF)
+	local textButton2 = Instance.new("TextButton")
+	textButton2.Name = "ToggleBtn"
+	textButton2.Size = UDim2.new(0, 42, 0, 18)
+	textButton2.Position = UDim2.new(1, -28, 0.5, 0)
+	textButton2.AnchorPoint = Vector2.new(1, 0.5)
+	textButton2.BackgroundColor3 = flag2 and Color3.fromRGB(120, 30, 180) or Color3.fromRGB(50, 15, 75)
+	textButton2.Text = flag2 and "ON" or "OFF"
+	textButton2.TextColor3 = Color3.fromRGB(240, 220, 255)
+	textButton2.TextSize = 12
+	textButton2.Font = Enum.Font.GothamBlack
+	textButton2.Parent = frame2
+
+	tbl5.toggleBtn = textButton2
+
+	local uiCorner2 = Instance.new("UICorner")
+	uiCorner2.CornerRadius = UDim.new(0, 5)
+	uiCorner2.Parent = textButton2
+
+	-- Progress Bar Frame
+	local frame4 = Instance.new("Frame")
+	frame4.Name = "ProgressBarBg"
+	frame4.Size = UDim2.new(1, -16, 0, 16)
+	frame4.Position = UDim2.new(0, 8, 0, 28)
+	frame4.BackgroundColor3 = Color3.fromRGB(50, 15, 80)
+	frame4.BackgroundTransparency = 0.3
+	frame4.ClipsDescendants = true
+	frame4.Parent = frame
+
+	local uiCorner4 = Instance.new("UICorner")
+	uiCorner4.CornerRadius = UDim.new(0, 8)
+	uiCorner4.Parent = frame4
+
+	local frame5 = Instance.new("Frame")
+	frame5.Name = "ProgressFill"
+	frame5.Size = UDim2.new(0, 0, 1, 0)
+	frame5.BackgroundColor3 = Color3.fromRGB(180, 80, 255)
+	frame5.Parent = frame4
+
+	local uiCorner5 = Instance.new("UICorner")
+	uiCorner5.CornerRadius = UDim.new(0, 8)
+	uiCorner5.Parent = frame5
+	v2 = frame5
+	fn3()
+
+	local textLabel3 = Instance.new("TextLabel")
+	textLabel3.Name = "PercentLabel"
+	textLabel3.Size = UDim2.new(1, 0, 1, 0)
+	textLabel3.BackgroundTransparency = 1
+	textLabel3.Text = "0%"
+	textLabel3.Font = Enum.Font.GothamBlack
+	textLabel3.TextSize = 13
+	textLabel3.TextColor3 = Color3.fromRGB(255, 255, 255)
+	textLabel3.Parent = frame4
+
+	RunService.Heartbeat:Connect(function()
+		textLabel3.Text = math.floor(math.clamp(_G.StealProgress or 0, 0, 1) * 100) .. "%"
+	end)
+
+	-- Gear / Options Sub-panel
+	local frame7 = Instance.new("Frame")
+	frame7.Name = "OptionsPanel"
+	frame7.Size = UDim2.new(1, -16, 0, 40)
+	frame7.Position = UDim2.new(0, 8, 0, 48)
+	frame7.BackgroundTransparency = 1
+	frame7.Visible = false
+	frame7.Parent = frame
+
+	local gearOpen = false
+	textButton.MouseButton1Click:Connect(function()
+		gearOpen = not gearOpen
+		frame7.Visible = gearOpen
+		frame.Size = gearOpen and UDim2.new(0, 280, 0, 96) or UDim2.new(0, 280, 0, 52)
+	end)
+
+	-- ========================================================
+	-- 2. SEPARATED PLAYER BLOCKER & SERVER LIST WINDOW (Docked Left)
+	-- ========================================================
+	local playerListPanel = Instance.new("Frame")
+	playerListPanel.Name = "PlayerListPanel"
+	playerListPanel.Size = UDim2.new(0, 280, 0, 180)
+	playerListPanel.Position = UDim2.new(0, 15, 0, 205) -- Stacked right under the main window
+	playerListPanel.BackgroundColor3 = Color3.fromRGB(20, 5, 30)
+	playerListPanel.BackgroundTransparency = 0.15
+	playerListPanel.Visible = false
+	playerListPanel.Parent = screenGui
+
+	local pListStroke = Instance.new("UIStroke")
+	pListStroke.Color = Color3.fromRGB(180, 60, 255)
+	pListStroke.Thickness = 2
+	pListStroke.Transparency = 0.3
+	pListStroke.Parent = playerListPanel
+
+	local pListCorner = Instance.new("UICorner")
+	pListCorner.CornerRadius = UDim.new(0, 12)
+	pListCorner.Parent = playerListPanel
+
+	local pListTopRow = Instance.new("Frame")
+	pListTopRow.Size = UDim2.new(1, -16, 0, 26)
+	pListTopRow.Position = UDim2.new(0, 8, 0, 6)
+	pListTopRow.BackgroundTransparency = 1
+	pListTopRow.Parent = playerListPanel
+
+	local pListTitle = Instance.new("TextLabel")
+	pListTitle.Size = UDim2.new(0.8, 0, 1, 0)
+	pListTitle.BackgroundTransparency = 1
+	pListTitle.Text = "PLAYERS & BLOCKER"
+	pListTitle.Font = Enum.Font.GothamBold
+	pListTitle.TextSize = 11
+	pListTitle.TextColor3 = Color3.fromRGB(220, 180, 255)
+	pListTitle.TextXAlignment = Enum.TextXAlignment.Left
+	pListTitle.Parent = pListTopRow
+
+	local closePlayersBtn = Instance.new("TextButton")
+	closePlayersBtn.Size = UDim2.new(0, 22, 0, 22)
+	closePlayersBtn.Position = UDim2.new(1, 0, 0.5, 0)
+	closePlayersBtn.AnchorPoint = Vector2.new(1, 0.5)
+	closePlayersBtn.BackgroundColor3 = Color3.fromRGB(150, 30, 80)
+	closePlayersBtn.Text = "✕"
+	closePlayersBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+	closePlayersBtn.TextSize = 11
+	closePlayersBtn.Font = Enum.Font.GothamBold
+	closePlayersBtn.Parent = pListTopRow
+
+	local cpCorner = Instance.new("UICorner")
+	cpCorner.CornerRadius = UDim.new(0, 4)
+	cpCorner.Parent = closePlayersBtn
+
+	local scrollPlayers = Instance.new("ScrollingFrame")
+	scrollPlayers.Size = UDim2.new(1, -16, 1, -42)
+	scrollPlayers.Position = UDim2.new(0, 8, 0, 36)
+	scrollPlayers.BackgroundTransparency = 1
+	scrollPlayers.CanvasSize = UDim2.new(0, 0, 0, 0)
+	scrollPlayers.AutomaticCanvasSize = Enum.AutomaticSize.Y
+	scrollPlayers.ScrollBarThickness = 4
+	scrollPlayers.Parent = playerListPanel
+
+	local scrollListLayout = Instance.new("UIListLayout")
+	scrollListLayout.SortOrder = Enum.SortOrder.LayoutOrder
+	scrollListLayout.Padding = UDim.new(0, 4)
+	scrollListLayout.Parent = scrollPlayers
+
+	local function updateServerPlayerList()
+		for _, child in ipairs(scrollPlayers:GetChildren()) do
+			if child:IsA("Frame") then
+				child:Destroy()
+			end
+		end
+
+		for _, p in ipairs(Players:GetPlayers()) do
+			if p ~= localPlayer then
+				local row = Instance.new("Frame")
+				row.Size = UDim2.new(1, 0, 0, 28)
+				row.BackgroundColor3 = Color3.fromRGB(45, 15, 65)
+				row.Parent = scrollPlayers
+
+				local rowCorner = Instance.new("UICorner")
+				rowCorner.CornerRadius = UDim.new(0, 5)
+				rowCorner.Parent = row
+
+				local nameLbl = Instance.new("TextLabel")
+				nameLbl.Size = UDim2.new(0.6, 0, 1, 0)
+				nameLbl.Position = UDim2.new(0, 6, 0, 0)
+				nameLbl.BackgroundTransparency = 1
+				nameLbl.Text = p.DisplayName
+				nameLbl.TextColor3 = Color3.fromRGB(240, 220, 255)
+				nameLbl.TextSize = 11
+				nameLbl.Font = Enum.Font.GothamMedium
+				nameLbl.TextXAlignment = Enum.TextXAlignment.Left
+				nameLbl.Parent = row
+
+				local blockBtn = Instance.new("TextButton")
+				blockBtn.Size = UDim2.new(0.35, 0, 0.75, 0)
+				blockBtn.Position = UDim2.new(0.62, 0, 0.125, 0)
+				blockBtn.BackgroundColor3 = Color3.fromRGB(160, 40, 100)
+				blockBtn.Text = "Block"
+				blockBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+				blockBtn.TextSize = 11
+				blockBtn.Font = Enum.Font.GothamBold
+				blockBtn.Parent = row
+
+				local bBtnCorner = Instance.new("UICorner")
+				bBtnCorner.CornerRadius = UDim.new(0, 4)
+				bBtnCorner.Parent = blockBtn
+
+				blockBtn.MouseButton1Click:Connect(function()
+					pcall(function()
+						game:GetService("StarterGui"):SetCore("PromptBlockPlayer", p)
+					end)
+					blockBtn.Text = "Blocked"
+					blockBtn.BackgroundColor3 = Color3.fromRGB(70, 140, 90)
+					blockBtn.Active = false
+				end)
+			end
+		end
+	end
+
+	Players.PlayerAdded:Connect(updateServerPlayerList)
+	Players.PlayerRemoving:Connect(updateServerPlayerList)
+
+	closePlayersBtn.MouseButton1Click:Connect(function()
+		playerListPanel.Visible = false
+	end)
+
+	-- ========================================================
+	-- 3. FLOATING TOGGLE BUTTON FOR PLAYER LIST (Docked Left)
+	-- ========================================================
+	local openPlayersFloatBtn = Instance.new("TextButton")
+	openPlayersFloatBtn.Name = "OpenPlayersFloatBtn"
+	openPlayersFloatBtn.Size = UDim2.new(0, 42, 0, 42)
+	-- Placed right below the windows on the left side
+	openPlayersFloatBtn.Position = UDim2.new(0, 15, 0, 395)
+	openPlayersFloatBtn.BackgroundColor3 = Color3.fromRGB(120, 30, 180)
+	openPlayersFloatBtn.BorderSizePixel = 0
+	openPlayersFloatBtn.Text = "👥"
+	openPlayersFloatBtn.TextSize = 18
+	openPlayersFloatBtn.Font = Enum.Font.GothamBold
+	openPlayersFloatBtn.Parent = screenGui
+
+	local floatBtnStroke = Instance.new("UIStroke")
+	floatBtnStroke.Color = Color3.fromRGB(180, 60, 255)
+	floatBtnStroke.Thickness = 2
+	floatBtnStroke.Transparency = 0.3
+	floatBtnStroke.Parent = openPlayersFloatBtn
+
+	local floatCorner = Instance.new("UICorner")
+	floatCorner.CornerRadius = UDim.new(0, 10)
+	floatCorner.Parent = openPlayersFloatBtn
+
+	openPlayersFloatBtn.MouseButton1Click:Connect(function()
+		playerListPanel.Visible = not playerListPanel.Visible
+		if playerListPanel.Visible then
+			updateServerPlayerList()
+		end
+	end)
+
+	-- Keep dragging enabled in case you want to reposition them anywhere else
+	local function makeDraggable(guiObj)
+		local dragging = false
+		local dragInput, dragStart, startPos
+
+		guiObj.InputBegan:Connect(function(input)
+			if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+				dragging = true
+				dragStart = input.Position
+				startPos = guiObj.Position
+
+				input.Changed:Connect(function()
+					if input.UserInputState == Enum.UserInputState.End then
+						dragging = false
+					end
+				end)
+			end
+		end)
+
+		UserInputService.InputChanged:Connect(function(input)
+			if dragging and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
+				local delta = input.Position - dragStart
+				guiObj.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+			end
+		end)
+	end
+
+	makeDraggable(frame)
+	makeDraggable(playerListPanel)
+	makeDraggable(openPlayersFloatBtn)
+
+	textButton2.Activated:Connect(function()
+		fn22(not flag2)
+	end)
+
+	fn22(flag2, true)
+end
+
+fn20(n)
+fn23()
+
+print("CHOCOLATE AUTO GRAB + PURPLE LEFT-SIDE THEME LOADED SUCCESSFULLY")
+
